@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTM Builder</title>
+  <style>
+    :root {
+      --border: #d9dde3;
+      --text: #1f2937;
+      --muted: #667085;
+      --bg: #f6f7f9;
+      --white: #ffffff;
+      --primary: #111827;
+      --primary-hover: #374151;
+      --success: #067647;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 48px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .intro {
+      margin: 0 0 28px;
+      color: var(--muted);
+    }
+
+    .field {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .required {
+      color: #b42318;
+      font-weight: 400;
+      font-size: 13px;
+      margin-left: 5px;
+    }
+
+    .description {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    select:focus,
+    input:focus {
+      outline: 2px solid #cbd5e1;
+      outline-offset: 1px;
+    }
+
+    .help {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      padding: 11px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .primary:hover { background: var(--primary-hover); }
+
+    .secondary {
+      background: #eef0f3;
+      color: var(--text);
+    }
+
+    .output {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .output h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      resize: vertical;
+      font: 14px/1.5 monospace;
+      background: #fafafa;
+    }
+
+    .status {
+      min-height: 20px;
+      margin-top: 8px;
+      color: var(--success);
+      font-size: 14px;
+    }
+
+    .examples {
+      margin-top: 30px;
+      padding: 18px;
+      background: #f8fafc;
+      border-radius: 8px;
+    }
+
+    .examples h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .examples ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .container { margin: 24px auto; }
+      .card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+    <main class="container">
+        <section class="card">
+            <h1>UTM Builder</h1>
+            <p class="intro">
+            Use the form below to build a standardized campaign URL.
+            This form should be viewed on desktop.
+            This form uses preset Source and Medium values, and custom fields for campaign, content, and term.
+            </p>
+
+            <form id="utmForm" novalidate>
+                <div class="field">
+                <label for="destination_url">Destination URL <span class="required">Required</span></label>
+                <p class="description">Enter the full URL where visitors should land. Including the "https://" in the beginning of the URL.</p>
+                <input id="destination_url" name="destination_url" type="url" placeholder="https://www.example.com/page" required>
+                </div>
+            </form>
+
+            <div class="actions">
+                <button type="button" class="primary" id="buildButton">Build UTM URL</button>
+                <button type="button" class="secondary" id="clearButton">Clear</button>
+            </div>
+
+            <section class="output" aria-live="polite">
+                <h2>Generated Tracked URL</h2>
+                <textarea id="output" readonly placeholder="Your UTM-tagged URL will appear here."></textarea>
+                <div class="actions">
+                <button type="button" class="secondary" id="copyButton">Copy URL</button>
+                </div>
+                <div class="status" id="status"></div>
+            </section>
+            <!--
+            <div class="examples">
+            <h3>Configuration-driven setup</h3>
+            <ul>
+            <li>Source and Medium are controlled dropdown lists.</li>
+            <li>Campaign, Content, and Term are flexible text fields.</li>
+            <li>Edit the <code>UTM_CONFIG</code> JSON object in this file to change labels, descriptions, options, or placeholders.</li>
+            <li>Values are URL-encoded automatically.</li>
+            </ul>
+            </div>
+            -->
+        </section>
+    </main>
+    <script>
+    /* UTM CONFIGURATION
+      Edit this JSON-style object to manage dropdowns and fields.
+      No other JavaScript changes are required for normal updates. 
+
+      */
+
+      const UTM_CONFIG = {
+      utm_source: {
+        label: "Campaign Source",
+        description: "Where is the traffic coming from? How is someone finding the URL?",
+        required: true,
+        type: "select",
+        options: [
+          "eloqua",
+          "outlook",
+          "google",
+          "bing",
+          "yahoo",
+          "facebook",
+          "instagram",
+          "linkedin",
+          "twitter",
+          "youtube",
+          "pandora",
+          "spotx",
+          "groundtruth",
+          "bloomberg",
+          "linknyc",
+          "asklocala",
+          "(direct)"
+        ]
+      },
+
+      utm_medium: {
+        label: "Campaign Medium",
+        description: "What channel is being used?",
+        required: true,
+        type: "select",
+        options: [
+          "email",
+          "cpc",
+          "referral",
+          "affiliate",
+          "paid",
+          "paid_social",
+          "organic_search",
+          "organic",
+          "sms",
+          "(none)"
+        ]
+      },
+
+      utm_campaign: {
+        label: "Campaign Name",
+        description: "Use a descriptive campaign name. Use dashes between words.",
+        required: true,
+        type: "text",
+        placeholder: "campaign-name"
+      },
+
+      utm_content: {
+        label: "Campaign Content",
+        description: "Not required but this helps measure traffic by creative name, size, format, or other useful descriptors. Use dashes between words. Use \`qr-code\` for a QR code",
+        required: false,
+        type: "text",
+        placeholder: "creative-name-size-format"
+      },
+
+      utm_term: {
+        label: "Campaign Term",
+        description: "Use for paid-search keywords or advertising placement details. Use dashes between words.",
+        required: false,
+        type: "text",
+        placeholder: "keyword-or-placement"
+      }
+    };
+
+    const form = document.getElementById("utmForm");
+    const output = document.getElementById("output");
+    const status = document.getElementById("status");
+
+    function createField(key, config) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "field";
+
+      const label = document.createElement("label");
+      label.htmlFor = key;
+      label.textContent = config.label;
+
+      if (config.required) {
+        const required = document.createElement("span");
+        required.className = "required";
+        required.textContent = "Required";
+        label.appendChild(required);
+      }
+
+      const description = document.createElement("p");
+      description.className = "description";
+      description.textContent = config.description || "";
+
+      let input;
+
+      if (config.type === "select") {
+        input = document.createElement("select");
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select an option";
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        input.appendChild(placeholder);
+
+        config.options.forEach(option => {
+          const item = document.createElement("option");
+          item.value = option;
+          item.textContent = option;
+          input.appendChild(item);
+        });
+      } else {
+        input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = config.placeholder || "";
+      }
+
+      input.id = key;
+      input.name = key;
+      input.required = Boolean(config.required);
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(description);
+      wrapper.appendChild(input);
+
+      if (key === "utm_term") {
+        const help = document.createElement("div");
+        help.className = "help";
+        help.textContent = "Example: {keyword}, newsfeed, story, reels, marketplace";
+        wrapper.appendChild(help);
+      }
+
+      return wrapper;
+    }
+
+    function renderForm() {
+      Object.entries(UTM_CONFIG).forEach(([key, config]) => {
+        form.appendChild(createField(key, config));
+      });
+    }
+
+    function buildUrl() {
+      status.textContent = "";
+      status.style.color = "var(--success)";
+
+      const destinationInput = document.getElementById("destination_url");
+      const baseUrl = destinationInput.value.trim();
+
+      if (!baseUrl) {
+        destinationInput.focus();
+        status.textContent = "Destination URL is required.";
+        status.style.color = "#b42318";
+        return;
+      }
+
+      let url;
+      try { url = new URL(baseUrl); }
+      catch (error) {
+        destinationInput.focus();
+        status.textContent = "Please enter a valid destination URL.";
+        status.style.color = "#b42318";
+        return;
+      }
+
+      Object.keys(UTM_CONFIG).forEach(key => url.searchParams.delete(key));
+
+      for (const [key, config] of Object.entries(UTM_CONFIG)) {
+        const input = document.getElementById(key);
+        const value = input.value.trim();
+        if (config.required && !value) {
+          input.focus();
+          status.textContent = `${config.label} is required.`;
+          status.style.color = "#b42318";
+          return;
+        }
+        if (value) url.searchParams.set(key.toLowerCase(), value.toLowerCase());
+      }
+
+      output.value = url.toString();
+      status.textContent = "UTM URL created successfully.";
+    }
+    function clearForm() {
+      form.reset();
+      output.value = "";
+      status.textContent = "";
+    }
+
+    async function copyUrl() {
+      if (!output.value) {
+        status.textContent = "Build a URL first.";
+        status.style.color = "#b42318";
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(output.value);
+        status.textContent = "URL copied to clipboard.";
+        status.style.color = "var(--success)";
+      } catch (error) {
+        output.select();
+        document.execCommand("copy");
+        status.textContent = "URL copied to clipboard.";
+        status.style.color = "var(--success)";
+      }
+    }
+
+    document.getElementById("buildButton").addEventListener("click", buildUrl);
+    document.getElementById("clearButton").addEventListener("click", clearForm);
+    document.getElementById("copyButton").addEventListener("click", copyUrl);
+
+    renderForm();
+
+    </script>
+</body>
